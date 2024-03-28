@@ -3,6 +3,7 @@
 """
 
 from decimal import ROUND_HALF_UP, Decimal
+import datetime
 
 from collectors.models import LocationInfoDTO
 
@@ -36,6 +37,16 @@ class Renderer:
             f"Население страны: {await self._format_population()} чел.",
             f"Курсы валют: {await self._format_currency_rates()}",
             f"Погода: {self.location_info.weather.temp} °C",
+            f"Площадь: {self.location_info.location.area} км2",
+            f"Широта столицы: {self.location_info.location.latitude}",
+            f"Долгота столицы: {self.location_info.location.longitude}",
+            f"Время в столице: {await self._format_current_time()}",
+            f"Часовой пояс столицы: {await self._get_timezone()}",
+            f"Температура: {self.location_info.weather.temp} °C",
+            f"Погода: {self.location_info.weather.description}",
+            f"Влажность: {self.location_info.weather.humidity}%",
+            f"Видимость: {self.location_info.weather.visibility}",
+            f"Скорость ветра: {self.location_info.weather.wind_speed} м/с",
         )
 
     async def _format_languages(self) -> str:
@@ -71,3 +82,21 @@ class Renderer:
             f"{currency} = {Decimal(rates).quantize(exp=Decimal('.01'), rounding=ROUND_HALF_UP)} руб."
             for currency, rates in self.location_info.currency_rates.items()
         )
+
+    async def _get_timezone(self) -> str:
+        """
+        Форматирование информации о времени.
+        :return:
+        """
+        hours = self.location_info.weather.timezone / 3600.0
+        return "UTC{:+d}:{:02d}".format(int(hours), int((hours % 1) * 60))
+
+    async def _format_current_time(self) -> str:
+        """
+        Форматирование информации о времени.
+        :return:
+        """
+        dt = datetime.datetime.now() + datetime.timedelta(
+            seconds=self.location_info.weather.timezone
+        )
+        return dt.strftime("%X, %x")
