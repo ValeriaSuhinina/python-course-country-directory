@@ -4,6 +4,8 @@
 
 from decimal import ROUND_HALF_UP, Decimal
 import datetime
+from textwrap import fill
+from typing import Optional
 
 from prettytable import PrettyTable
 
@@ -34,6 +36,7 @@ class Renderer:
         country_tab = PrettyTable(["Поле", "Значение"], align="l")
         capital_tab = PrettyTable(["Поле", "Значение"], align="l")
         weather_tab = PrettyTable(["Поле", "Значение"], align="l")
+        news_tab = PrettyTable(["Название", "Автор", "Описание", "Дата публикации", "Ссылка"], align="l")
 
         country_tab.add_row(["Страна", f"{self.location_info.location.name}"])
         country_tab.add_row(["Площадь", f"{self.location_info.location.area} км²"])
@@ -54,7 +57,21 @@ class Renderer:
         weather_tab.add_row(["Видимость", f"{self.location_info.weather.visibility}"])
         weather_tab.add_row(["Скорость ветра", f"{self.location_info.weather.wind_speed} м/с"])
 
-        return country_tab, capital_tab, weather_tab
+        for news_entry in self.location_info.news:
+            news_tab.add_row(
+                [
+                    fill(news_entry.title, width=50),
+                    news_entry.author,
+                    fill(await self._format_description(news_entry.description), width=50),
+                    fill(
+                        await self._format_publication_date(news_entry.publishedAt),
+                        width=10,
+                    ),
+                    fill(news_entry.url, width=50),
+                ]
+            )
+
+        return country_tab, capital_tab, weather_tab, news_tab
 
     async def _format_languages(self) -> str:
         """
@@ -107,3 +124,23 @@ class Renderer:
             seconds=self.location_info.weather.timezone
         )
         return dt.strftime("%X, %x")
+
+    async def _format_publication_date(self, date: str) -> str:
+        """
+        Форматирование даты публикации новости.
+        :return:
+        """
+        dt = datetime.datetime.strptime(
+            date, "%Y-%m-%dT%H:%M:%SZ"
+        ) + datetime.timedelta(seconds=self.location_info.weather.timezone)
+        return dt.strftime("%X, %x")
+
+    @staticmethod
+    async def _format_description(description: Optional[str]) -> str:
+        """
+        Форматирование описания новости.
+        :return:
+        """
+        if description is None:
+            return "-"
+        return description
