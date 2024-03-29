@@ -22,7 +22,7 @@ from collectors.models import (
     CurrencyRatesDTO,
     CurrencyInfoDTO,
     WeatherInfoDTO,
-    NewsInfoDTO
+    NewsInfoDTO,
 )
 from settings import (
     MEDIA_PATH,
@@ -182,7 +182,7 @@ class WeatherCollector(BaseCollector):
         return CACHE_TTL_WEATHER
 
     async def collect(
-            self, locations: FrozenSet[LocationDTO] = frozenset(), **kwargs: Any
+        self, locations: FrozenSet[LocationDTO] = frozenset(), **kwargs: Any
     ) -> None:
 
         target_dir_path = f"{MEDIA_PATH}/weather"
@@ -200,7 +200,7 @@ class WeatherCollector(BaseCollector):
                 if result:
                     result_str = json.dumps(result)
                     async with aiofiles.open(
-                            await self.get_file_path(filename), mode="w"
+                        await self.get_file_path(filename), mode="w"
                     ) as file:
                         await file.write(result_str)
 
@@ -249,7 +249,7 @@ class NewsCollector(BaseCollector):
         return CACHE_TTL_NEWS
 
     async def collect(
-            self, locations: FrozenSet[LocationDTO] = frozenset(), **kwargs: Any
+        self, locations: FrozenSet[LocationDTO] = frozenset(), **kwargs: Any
     ) -> None:
 
         target_dir_path = f"{MEDIA_PATH}/news"
@@ -265,7 +265,7 @@ class NewsCollector(BaseCollector):
                 if result:
                     result_str = json.dumps(result)
                     async with aiofiles.open(
-                            await self.get_file_path(filename), mode="w"
+                        await self.get_file_path(filename), mode="w"
                     ) as file:
                         await file.write(result_str)
 

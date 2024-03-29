@@ -1,10 +1,8 @@
 """
 Описание моделей данных (DTO).
 """
-
-from pydantic import Field, BaseModel
 from typing import Optional
-from datetime import datetime
+from pydantic import Field, BaseModel
 
 
 class HashableBaseModel(BaseModel):
@@ -180,6 +178,8 @@ class NewsInfoDTO(BaseModel):
     description: Optional[str]
     url: str
     publishedAt: str
+
+
 class LocationInfoDTO(BaseModel):
     """
     Модель данных для представления общей информации о месте.
